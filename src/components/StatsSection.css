@@ -1,86 +1,88 @@
 .stats-section {
-  min-height: 100vh;
+  height: 300vh; /* Make it tall to allow scrolling */
+  position: relative;
+  z-index: 1;
+}
+
+.stats-sticky-container {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.horizontal-scroll-track {
+  display: flex;
+  align-items: center;
+  padding-left: 15vw; /* Start slightly indented */
+  width: 350vw; /* Increased width to push second item further off-screen */
+  will-change: transform;
+}
+
+.stat-item {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
-  background: transparent; /* Background now handled by shared-background */
-  position: relative;
-  z-index: 1;
-  overflow: hidden;
+  margin-right: 80vw; /* Much larger gap between items */
 }
 
-.stats-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 3rem;
-  max-width: 1200px;
-  width: 100%;
-  position: relative;
-  z-index: 1;
-}
-
-.stat-card {
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15) 0%, rgba(27, 27, 58, 0.9) 100%);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 16px;
-  padding: 3rem 2rem;
-  text-align: center;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  transform-style: preserve-3d;
-}
-
-.stat-card:hover {
-  border-color: rgba(74, 144, 226, 0.8);
-  box-shadow: 0 20px 60px rgba(74, 144, 226, 0.4);
-}
-
-.stat-glow {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(74, 144, 226, 0.3) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.stat-value {
-  font-size: 4rem;
+/* Red Box Style */
+.red-box {
+  width: 400px;
+  height: 300px;
+  background-color: #C8102E;
+  color: white;
+  padding: 3rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 1rem;
-  line-height: 1;
+  line-height: 1.4;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
   position: relative;
-  z-index: 1;
-  text-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
 }
 
-.stat-label {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
-  font-weight: 400;
-  position: relative;
-  z-index: 1;
+/* Blue Circle Style */
+.blue-circle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-circle {
+  width: 400px;
+  height: 400px;
+  background-color: #00A3E8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem;
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
 }
 
 @media (max-width: 768px) {
-  .stats-container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .horizontal-scroll-track {
+    padding-left: 10vw;
+    width: 300vw;
   }
   
-  .stat-value {
-    font-size: 3rem;
+  .stat-item {
+    margin-right: 20vw;
   }
-  
-  .stat-label {
-    font-size: 1rem;
+
+  .red-box, .stat-circle {
+    width: 300px;
+    height: 300px; /* Make red box square on mobile for better fit */
+    font-size: 1.5rem;
+    padding: 2rem;
   }
 }
 

@@ -1,27 +1,35 @@
 import { useRef, useState, useEffect } from 'react'
-import { useInView, motion } from 'framer-motion'
+import { useInView, motion, useScroll, useTransform } from 'framer-motion'
 import './StatsSection.css'
-
-const stats = [
-  { value: '2', label: 'New Ivy Plants', suffix: '' },
-  { value: '£1bn', label: 'for the UK economy', suffix: '' },
-  { value: '10', label: 'slices of cake', suffix: '' },
-]
 
 const StatsSection = () => {
   const sectionRef = useRef(null)
   const [scrollProgress, setScrollProgress] = useState(0)
-  const isInView = useInView(sectionRef, { amount: 0.2, once: false })
+  
+  // Use Framer Motion's useScroll for smoother parallax
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  })
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY
+      if (!sectionRef.current) return
+      
+      const rect = sectionRef.current.getBoundingClientRect()
       const windowHeight = window.innerHeight
-      // Stats section starts appearing when hero starts fading (around 80% of first viewport)
-      const fadeStart = windowHeight * 0.8
-      const fadeEnd = windowHeight * 1.2
-      const progress = Math.max(0, Math.min(1, (scrollY - fadeStart) / (fadeEnd - fadeStart)))
-      setScrollProgress(progress)
+      
+      // Calculate progress within the section
+      // We want the animation to happen when the section is fixed/sticky
+      // The section should be tall enough to allow for scrolling
+      
+      // Simple calculation: how far has the top of the section moved up?
+      // We start counting when the section hits the top of the viewport (or slightly before)
+      const start = 0
+      const end = -windowHeight * 1.5 // Scroll distance of 1.5 viewport heights
+      
+      const rawProgress = Math.max(0, Math.min(1, (start - rect.top) / (start - end)))
+      setScrollProgress(rawProgress)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -30,109 +38,98 @@ const StatsSection = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Calculate section opacity based on scroll progress
-  const sectionOpacity = Math.max(0, Math.min(1, scrollProgress))
+  // Scroll snapping logic
+  useEffect(() => {
+    let isScrolling;
+    
+    const handleScrollSnap = () => {
+      window.clearTimeout(isScrolling);
 
+      // Set a timeout to run after scrolling ends
+      isScrolling = setTimeout(() => {
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        
+        // Calculate current progress again (same logic as above)
+        // Note: We need to get the section position again
+        if (!sectionRef.current) return;
+        const rect = sectionRef.current.getBoundingClientRect();
+        
+        // Section geometry
+        // The section is 300vh tall (from CSS)
+        // It becomes sticky when it hits top (rect.top <= 0)
+        // It stops being sticky when the bottom hits bottom (rect.bottom <= windowHeight)
+        
+        // We define snap points based on scroll depth into the section
+        // Start of section (Hero fade out done): roughly 200vh from top of page
+        // We want to snap to:
+        // 1. The Red Box (start of stats scroll)
+        // 2. The Blue Circle (further down stats scroll)
+        
+        // Let's define snap points relative to the document
+        // The section starts after the hero wrapper (200vh)
+        const sectionStart = windowHeight * 2; 
+        
+        // Snap point 1: Red Box (approx 200vh + some buffer)
+        const snapPoint1 = sectionStart + windowHeight * 0.2;
+        
+        // Snap point 2: Blue Circle (further down, approx 200vh + 1.2vh)
+        const snapPoint2 = sectionStart + windowHeight * 1.2;
+        
+        // Check distance to snap points
+        const dist1 = Math.abs(scrollY - snapPoint1);
+        const dist2 = Math.abs(scrollY - snapPoint2);
+        
+        // Only snap if close enough (within 300px)
+        const snapThreshold = 300;
+        
+        if (dist1 < snapThreshold && dist1 < dist2) {
+          window.scrollTo({ top: snapPoint1, behavior: 'smooth' });
+        } else if (dist2 < snapThreshold && dist2 < dist1) {
+          window.scrollTo({ top: snapPoint2, behavior: 'smooth' });
+        }
+        
+      }, 100); // Wait 100ms after scroll stops
+    };
+
+    window.addEventListener('scroll', handleScrollSnap, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollSnap);
+      window.clearTimeout(isScrolling);
+    };
+  }, []);
+
+  // Calculate horizontal scroll
+  // We want to shift left by roughly the distance between the centers of the two items
+  // Distance approx: 400px (item) + 80vw (margin)
+  // We map scroll progress (0 to 1) to this shift
+  // We complete the shift at 90% progress so it sits for a moment
+  
+  const progress = Math.min(scrollProgress / 0.9, 1)
+  const shiftAmount = progress * 85 // Shift 85vw left
+  
   return (
-    <section 
-      ref={sectionRef} 
-      className="stats-section"
-      style={{
-        opacity: sectionOpacity,
-        pointerEvents: sectionOpacity > 0.1 ? 'auto' : 'none'
-      }}
-    >
-      <div className="stats-container">
-        {stats.map((stat, index) => (
-          <motion.div
-            key={index}
-            className="stat-card"
-            initial={{ opacity: 0, y: 100, scale: 0.8, rotateX: -15 }}
-            animate={isInView ? { 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              rotateX: 0
-            } : { 
-              opacity: 0, 
-              y: 100, 
-              scale: 0.8,
-              rotateX: -15
-            }}
-            transition={{
-              duration: 0.8,
-              delay: index * 0.15,
-              ease: [0.16, 1, 0.3, 1],
-              type: 'spring',
-              stiffness: 100,
-              damping: 15
-            }}
-            whileHover={{ 
-              scale: 1.08, 
-              y: -10,
-              rotateY: 5,
-              transition: { duration: 0.3 }
-            }}
-            style={{ perspective: 1000 }}
-          >
-            <motion.div
-              className="stat-value"
-              initial={{ scale: 0, rotate: -180, opacity: 0 }}
-              animate={isInView ? { 
-                scale: 1, 
-                rotate: 0,
-                opacity: 1
-              } : { 
-                scale: 0, 
-                rotate: -180,
-                opacity: 0
-              }}
-              transition={{
-                duration: 1,
-                delay: index * 0.15 + 0.4,
-                type: 'spring',
-                stiffness: 150,
-                damping: 12
-              }}
-            >
-              {stat.value}
-            </motion.div>
-            <motion.div
-              className="stat-label"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { 
-                opacity: 1, 
-                y: 0
-              } : { 
-                opacity: 0, 
-                y: 20
-              }}
-              transition={{
-                duration: 0.6,
-                delay: index * 0.15 + 0.8,
-                ease: 'easeOut'
-              }}
-            >
-              {stat.label}
-            </motion.div>
-            <motion.div
-              className="stat-glow"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={isInView ? { 
-                opacity: 1, 
-                scale: 1
-              } : { 
-                opacity: 0, 
-                scale: 0.5
-              }}
-              transition={{
-                duration: 1.2,
-                delay: index * 0.15 + 0.5,
-                ease: 'easeOut'
-              }}
-            />
-          </motion.div>
-        ))}
+    <section ref={sectionRef} className="stats-section">
+      <div className="stats-sticky-container">
+        <div className="horizontal-scroll-track" style={{ transform: `translateX(-${shiftAmount}vw)` }}>
+          
+          {/* Red Box - "The UK has the largest tech economy..." */}
+          <div className="stat-item red-box">
+            <div className="stat-content">
+              The UK has the largest tech economy in Europe, and third largest in the world
+            </div>
+          </div>
+
+          {/* Blue Circle - "We've produced more unicorns..." */}
+          <div className="stat-item blue-circle-container">
+            <div className="stat-circle">
+              <div className="stat-content">
+                We've produced more unicorns than France and Germany combined
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
   )
