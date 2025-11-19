@@ -107,7 +107,7 @@ const HeroSection = () => {
             } : {}
           }
         >
-          UK tech is moving at 100 miles an hour,<br />we're building a dashboard to track the pace
+          UK tech is moving at 100 miles an hour,<br />we're building a dashboard to track the pace...
         </div>
       </div>
     </section>

@@ -94,11 +94,14 @@ const GraphSection = () => {
 
             // Apply forces when graph data is loaded
             if (graphRef.current) {
-              // Stronger gravity to pull nodes to center
-              graphRef.current.d3Force('radial', d3.forceRadial(0, 0, 0).strength(0.16))
+              // Remove radial force to allow non-circular shape
+              graphRef.current.d3Force('radial', null)
               
-              // Vertical compression to create oval shape
-              graphRef.current.d3Force('vertical-compression', d3.forceY().strength(0.05))
+              // Strong vertical compression for oval shape
+              graphRef.current.d3Force('y-compression', d3.forceY().strength(0.2))
+              
+              // Weak horizontal compression to fill width
+              graphRef.current.d3Force('x-compression', d3.forceX().strength(0.05))
               
               // Collision force to prevent overlaps
               graphRef.current.d3Force('collision', d3.forceCollide()
@@ -116,6 +119,13 @@ const GraphSection = () => {
               
               // Re-heat simulation to apply new forces
               graphRef.current.d3ReheatSimulation()
+              
+              // Zoom to fit shortly after render to avoid delay
+              setTimeout(() => {
+                if (graphRef.current) {
+                  graphRef.current.zoomToFit(1000, 50)
+                }
+              }, 200)
             }
 
             const changeHighlight = () => {
@@ -389,11 +399,15 @@ const GraphSection = () => {
                 }
                 if (forceName === 'center') {
                    // Configure center force - increased for stronger pull to center
-                   force.strength(0.06)
+                   force.strength(0.05)
                 }
                 // Add vertical compression force to create oval/landscape spread
-                if (forceName === 'vertical-compression') {
-                  return d3.forceY().strength(0.05)
+                if (forceName === 'y-compression') {
+                  return d3.forceY().strength(0.2)
+                }
+                // Add horizontal compression
+                if (forceName === 'x-compression') {
+                  return d3.forceX().strength(0.05)
                 }
                 // Add collision force to prevent overlaps
                 if (forceName === 'collision') {
@@ -411,31 +425,11 @@ const GraphSection = () => {
                 }
               }}
               onEngineStop={() => {
+                // Optional: Ensure forces are maintained if needed, but don't re-heat or zoom here
                 if (graphRef.current) {
-                  // Add forces manually
-                  graphRef.current.d3Force('vertical-compression', d3.forceY().strength(0.05)) // Compress vertically to create width
-                  
-                  // Add collision force manually
-                  const simulation = graphRef.current.d3Force('collision', d3.forceCollide()
-                    .radius(node => {
-                      let size = node.size || 10
-                      // Central node needs much larger collision radius
-                      if (node.type === 'central') return size + 40
-                      if (node === highlightedNode) size *= 1.5
-                      if (node === hoveredNode) size *= 1.2
-                      return size + 20 // Moderate buffer
-                    })
-                    .strength(0.8)
-                    .iterations(3)
-                  )
-                  
-                  // Re-heat simulation
-                  graphRef.current.d3ReheatSimulation()
-                  
-                  // Zoom to fit
-                  setTimeout(() => {
-                    graphRef.current.zoomToFit(400, 100)
-                  }, 500)
+                  // Re-apply forces to ensure stability without restarting simulation loop
+                  graphRef.current.d3Force('y-compression', d3.forceY().strength(0.2))
+                  graphRef.current.d3Force('x-compression', d3.forceX().strength(0.05))
                 }
               }}
               // ZOOM_PAN_DISABLED: Set these to true to re-enable zoom and pan
