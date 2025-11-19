@@ -1,0 +1,127 @@
+.graph-section {
+  min-height: 100vh;
+  padding: 0;
+  background: transparent; /* Background now handled by shared-background */
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.graph-container {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.graph-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 2rem 2rem 1rem;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 2;
+}
+
+.graph-wrapper {
+  width: 100%;
+  flex: 1;
+  height: calc(100vh - 120px);
+  min-height: calc(100vh - 120px);
+  position: relative;
+  overflow: hidden;
+}
+
+.node-details {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(27, 27, 58, 0.95) 0%, rgba(27, 27, 58, 0.98) 100%);
+  border: 1px solid rgba(74, 144, 226, 0.5);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.node-details h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--accent);
+}
+
+.node-details p {
+  margin: 0.5rem 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.node-details p.description {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(74, 144, 226, 0.3);
+  font-size: 0.95rem;
+}
+
+.node-details strong {
+  color: var(--text-primary);
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 2rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
+
+@media (max-width: 768px) {
+  .graph-title {
+    font-size: 1.8rem;
+    padding: 1.5rem 1rem 0.5rem;
+  }
+  
+  .graph-wrapper {
+    height: calc(100vh - 100px);
+  }
+  
+  .node-details {
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+  
+  .node-details h3 {
+    font-size: 1.2rem;
+  }
+  
+  .graph-background .orb-1,
+  .graph-background .orb-2,
+  .graph-background .orb-3 {
+    width: 200px;
+    height: 200px;
+  }
+}
+
