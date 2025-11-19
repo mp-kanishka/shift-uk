@@ -118,6 +118,10 @@ const GraphSection = () => {
   }, [graphData])
 
   const handleNodeClick = (node) => {
+    // Don't show popup for central node
+    if (node.type === 'central') {
+      return
+    }
     setSelectedNode(node)
   }
 
@@ -257,15 +261,40 @@ const GraphSection = () => {
     
     // Draw label for central node, or hovered, selected, or highlighted nodes
     if (node.type === 'central' || node === hoveredNode || node === selectedNode || node === highlightedNode) {
-      const fontSize = node.type === 'central' ? 16 : 12
-      ctx.font = `bold ${fontSize}px sans-serif`
-      ctx.fillStyle = '#FFFFFF'
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)'
-      ctx.lineWidth = 4
+      const fontSize = node.type === 'central' ? 18 : 14
+      
+      // Use consistent font with the rest of the site
+      ctx.font = `700 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`
+      
+      // High quality text rendering
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.strokeText(node.name, node.x, node.y - size - 14)
-      ctx.fillText(node.name, node.x, node.y - size - 14)
+      
+      // Text position with better spacing
+      const labelY = node.y - size - 18
+      
+      // Multiple stroke passes for better outline quality
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)'
+      ctx.lineWidth = 5
+      ctx.lineJoin = 'round'
+      ctx.miterLimit = 2
+      ctx.strokeText(node.name, node.x, labelY)
+      
+      // Additional thinner stroke for smoothness
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)'
+      ctx.lineWidth = 3
+      ctx.strokeText(node.name, node.x, labelY)
+      
+      // White fill with subtle shadow
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
+      ctx.shadowBlur = 4
+      ctx.shadowOffsetY = 2
+      ctx.fillStyle = '#F5F5F5'
+      ctx.fillText(node.name, node.x, labelY)
+      
+      // Reset shadow
+      ctx.shadowBlur = 0
+      ctx.shadowOffsetY = 0
     }
   }
 
@@ -396,11 +425,6 @@ const GraphSection = () => {
           >
             <button className="close-button" onClick={() => setSelectedNode(null)}>×</button>
             <h3>{selectedNode.name}</h3>
-            {selectedNode.category && (
-              <p>
-                <strong>Category:</strong> {selectedNode.category}
-              </p>
-            )}
             {selectedNode.description && (
               <p className="description">{selectedNode.description}</p>
             )}

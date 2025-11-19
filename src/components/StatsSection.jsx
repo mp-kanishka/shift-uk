@@ -132,12 +132,11 @@ const StatsSection = () => {
 
           {/* Blue Circle - "We've produced more unicorns..." */}
           <div className="stat-item blue-circle-container">
-            <div className="stat-circle-secondary"></div>
-            <div className="stat-circle-tertiary"></div>
-            <div className="stat-circle">
-              <div className="stat-content">
-                We've produced more unicorns than France and Germany combined
-              </div>
+            <img src="/france.svg" alt="France" className="flag-circle flag-france" />
+            <img src="/germany.svg" alt="Germany" className="flag-circle flag-germany" />
+            <img src="/uk-blur.svg" alt="United Kingdom" className="flag-circle flag-uk" />
+            <div className="unicorns-stat-text">
+              We've produced more unicorns than France and Germany combined
             </div>
           </div>
 
