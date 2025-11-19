@@ -99,14 +99,16 @@ const StatsSection = () => {
     };
   }, []);
 
-  // Calculate horizontal scroll
-  // We want to shift left by roughly the distance between the centers of the two items
-  // Distance approx: 400px (item) + 80vw (margin)
-  // We map scroll progress (0 to 1) to this shift
-  // We complete the shift at 90% progress so it sits for a moment
-  
-  const progress = Math.min(scrollProgress / 0.9, 1)
-  const shiftAmount = progress * 85 // Shift 85vw left
+  // Calculate horizontal scroll with entry + exit buffers
+  // Start: wait ~20% before moving so the red box settles
+  // End: finish movement by ~70% so blue circle stays static while reader finishes
+  const startScroll = 0.2
+  const endScroll = 0.7
+  let horizontalP = 0
+  if (scrollProgress > startScroll) {
+    horizontalP = Math.min((scrollProgress - startScroll) / (endScroll - startScroll), 1)
+  }
+  const shiftAmount = horizontalP * 100 // Shift 100vw left
   
   return (
     <section ref={sectionRef} className="stats-section">
@@ -114,10 +116,18 @@ const StatsSection = () => {
         <div className="horizontal-scroll-track" style={{ transform: `translateX(-${shiftAmount}vw)` }}>
           
           {/* Red Box - "The UK has the largest tech economy..." */}
-          <div className="stat-item red-box">
-            <div className="stat-content">
-              The UK has the largest tech economy in Europe, and third largest in the world
+          <div className="stat-item red-box-group">
+            <div className="red-box">
+              <div className="stat-content">
+                The UK has the largest tech economy in Europe, and third largest in the world
+              </div>
             </div>
+            <img 
+              src="/europe.svg" 
+              alt="Stylised map of Europe highlighting the United Kingdom" 
+              className="europe-map"
+              loading="lazy"
+            />
           </div>
 
           {/* Blue Circle - "We've produced more unicorns..." */}

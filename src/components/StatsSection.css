@@ -17,7 +17,7 @@
 .horizontal-scroll-track {
   display: flex;
   align-items: center;
-  padding-left: 15vw; /* Start slightly indented */
+  padding-left: 5vw; /* Reduced from 15vw to shift red box left */
   width: 350vw; /* Increased width to push second item further off-screen */
   will-change: transform;
 }
@@ -28,6 +28,16 @@
   align-items: center;
   justify-content: center;
   margin-right: 80vw; /* Much larger gap between items */
+}
+
+.red-box-group {
+  gap: 3rem;
+  align-items: center;
+}
+
+.red-box-group .red-box,
+.red-box-group .europe-map {
+  transform: translateZ(0); /* helps Chrome render */
 }
 
 /* Red Box Style */
@@ -42,6 +52,14 @@
   line-height: 1.4;
   box-shadow: 0 20px 50px rgba(0,0,0,0.3);
   position: relative;
+}
+
+.europe-map {
+  width: min(60vw, 960px); /* roughly 3x larger but capped for very wide screens */
+  height: auto;
+  margin-left: -4rem;
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.35));
+  opacity: 0.9;
 }
 
 /* Blue Circle Style */
@@ -78,11 +96,21 @@
     margin-right: 20vw;
   }
 
+  .red-box-group {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
   .red-box, .stat-circle {
     width: 300px;
     height: 300px; /* Make red box square on mobile for better fit */
     font-size: 1.5rem;
     padding: 2rem;
+  }
+
+  .europe-map {
+    width: min(80vw, 480px);
+    margin-left: 0;
   }
 }
 
