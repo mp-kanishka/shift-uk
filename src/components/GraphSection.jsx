@@ -49,7 +49,7 @@ const GraphSection = () => {
               description: 'Central hub for UK AI investments',
               category: 'Central',
               type: 'central',
-              size: 35, // Much larger than other nodes
+              size: 28, // Much larger than other nodes (reduced from 35)
               fx: 0, // Fixed x position at center
               fy: 0  // Fixed y position at center
             }
@@ -66,7 +66,7 @@ const GraphSection = () => {
                 description: row.Description || '',
                 category: category,
                 type: 'investment',
-                size: 10 + Math.random() * 8 // Random size variation 10-18px
+                size: 8 + Math.random() * 5 // Random size variation 8-13px (reduced from 10-18px)
               }
               
               nodes.push(node)
@@ -88,11 +88,37 @@ const GraphSection = () => {
       })
   }, [])
 
-  // Random highlight effect - changes every 10 seconds
-  useEffect(() => {
-    if (graphData.nodes.length === 0) return
+          // Random highlight effect - changes every 10 seconds
+          useEffect(() => {
+            if (graphData.nodes.length === 0) return
 
-    const changeHighlight = () => {
+            // Apply forces when graph data is loaded
+            if (graphRef.current) {
+              // Stronger gravity to pull nodes to center
+              graphRef.current.d3Force('radial', d3.forceRadial(0, 0, 0).strength(0.16))
+              
+              // Vertical compression to create oval shape
+              graphRef.current.d3Force('vertical-compression', d3.forceY().strength(0.05))
+              
+              // Collision force to prevent overlaps
+              graphRef.current.d3Force('collision', d3.forceCollide()
+                .radius(node => {
+                  let size = node.size || 10
+                  // Central node needs much larger collision radius
+                  if (node.type === 'central') return size + 40
+                  if (node === highlightedNode) size *= 1.5
+                  if (node === hoveredNode) size *= 1.2
+                  return size + 10 // Moderate buffer (back to 10)
+                })
+                .strength(0.6) // Strength back to 0.6
+                .iterations(2) // Reduced iterations (from 3)
+              )
+              
+              // Re-heat simulation to apply new forces
+              graphRef.current.d3ReheatSimulation()
+            }
+
+            const changeHighlight = () => {
       const investmentNodes = graphData.nodes.filter(n => n.type === 'investment')
       if (investmentNodes.length > 0) {
         const randomNode = investmentNodes[Math.floor(Math.random() * investmentNodes.length)]
@@ -137,11 +163,11 @@ const GraphSection = () => {
     if (!node.x || !node.y) return // Safety check
     
     // Use calculated size, with fallback defaults
-    let baseSize = node.size || 12
+    let baseSize = node.size || 10
     
-    // Make highlighted node MUCH larger with smooth animation
+    // Make highlighted node larger with smooth animation
     if (node === highlightedNode) {
-      baseSize = baseSize * 2.5 // Highlighted nodes are 150% larger (was 80%)
+      baseSize = baseSize * 1.5 // Highlighted nodes are 50% larger (reduced from 150%)
     }
     
     // Hover makes it slightly larger
@@ -166,18 +192,24 @@ const GraphSection = () => {
       g: parseInt(categoryColor.slice(3, 5), 16),
       b: parseInt(categoryColor.slice(5, 7), 16)
     }
-    const glowColorRgba = node === hoveredNode || node === highlightedNode 
-      ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.9)` 
-      : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`
-    
-    // Draw glow effect
-    const glowGradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, size * 3)
-    glowGradient.addColorStop(0, glowColorRgba)
-    glowGradient.addColorStop(0.4, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`)
-    glowGradient.addColorStop(1, 'transparent')
-    
-    ctx.beginPath()
-    ctx.arc(node.x, node.y, size * 3, 0, 2 * Math.PI, false)
+            const glowColorRgba = node === hoveredNode || node === highlightedNode 
+              ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.9)` 
+              : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)` // Reduced glow opacity for regular nodes
+            
+            // Draw glow effect
+            const glowSize = node === highlightedNode ? size * 3 : size * 2 // Reduced glow radius for regular nodes
+            const glowGradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, glowSize)
+            
+            glowGradient.addColorStop(0, glowColorRgba)
+            if (node === highlightedNode) {
+              glowGradient.addColorStop(0.4, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`)
+            } else {
+              glowGradient.addColorStop(0.5, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`)
+            }
+            glowGradient.addColorStop(1, 'transparent')
+            
+            ctx.beginPath()
+            ctx.arc(node.x, node.y, glowSize, 0, 2 * Math.PI, false)
     ctx.fillStyle = glowGradient
     ctx.fill()
     
@@ -203,49 +235,35 @@ const GraphSection = () => {
       ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false)
       ctx.fillStyle = '#012169'
       ctx.fill()
-    } else {
-      // Glassy effect for regular nodes - semi-transparent with gradient
-      const glassGradient = ctx.createRadialGradient(
-        node.x - size * 0.4, 
-        node.y - size * 0.4, 
-        0,
-        node.x, 
-        node.y, 
-        size
-      )
-      glassGradient.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8)`)
-      glassGradient.addColorStop(0.5, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`)
-      glassGradient.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`)
-      
-      ctx.beginPath()
-      ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false)
-      ctx.fillStyle = glassGradient
-      ctx.fill()
-      
-      // Glassy highlight on top-left (simulates light reflection)
-      const highlightGradient = ctx.createRadialGradient(
-        node.x - size * 0.3,
-        node.y - size * 0.3,
-        0,
-        node.x - size * 0.3,
-        node.y - size * 0.3,
-        size * 0.6
-      )
-      highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)')
-      highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
-      
-      ctx.beginPath()
-      ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false)
-      ctx.fillStyle = highlightGradient
-      ctx.fill()
-      
-      // Outer glass ring for depth
-      ctx.beginPath()
-      ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false)
-      ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`
-      ctx.lineWidth = 2
-      ctx.stroke()
-    }
+            } else {
+              // Regular node drawing - solid color with inner glow
+              
+              // Main circle
+              ctx.beginPath()
+              ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false)
+              ctx.fillStyle = categoryColor
+              ctx.fill()
+              
+              // Subtle inner glow/gradient for depth
+              const innerGradient = ctx.createRadialGradient(
+                node.x - size * 0.3, 
+                node.y - size * 0.3, 
+                0,
+                node.x, 
+                node.y, 
+                size
+              )
+              innerGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)')
+              innerGradient.addColorStop(1, 'rgba(0, 0, 0, 0.1)')
+              
+              ctx.fillStyle = innerGradient
+              ctx.fill()
+              
+              // Border
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+              ctx.lineWidth = 1.5
+              ctx.stroke()
+            }
     
     // Draw selection ring
     if (node === selectedNode) {
@@ -258,10 +276,33 @@ const GraphSection = () => {
       ctx.stroke()
       ctx.shadowBlur = 0
     }
+  }
+
+  const paintLabels = (ctx, globalScale) => {
+    // Draw labels for important nodes (central, hovered, selected, highlighted)
+    // We draw them in a separate pass to ensure they are always on top
     
-    // Draw label for central node, or hovered, selected, or highlighted nodes
-    if (node.type === 'central' || node === hoveredNode || node === selectedNode || node === highlightedNode) {
-      const fontSize = node.type === 'central' ? 18 : 14
+    const nodesToLabel = []
+    
+    // Add central node
+    const centralNode = graphData.nodes.find(n => n.type === 'central')
+    if (centralNode) nodesToLabel.push(centralNode)
+    
+    // Add interacted nodes (avoiding duplicates)
+    if (highlightedNode && highlightedNode !== centralNode) nodesToLabel.push(highlightedNode)
+    if (selectedNode && selectedNode !== centralNode && selectedNode !== highlightedNode) nodesToLabel.push(selectedNode)
+    if (hoveredNode && hoveredNode !== centralNode && hoveredNode !== highlightedNode && hoveredNode !== selectedNode) nodesToLabel.push(hoveredNode)
+    
+    nodesToLabel.forEach(node => {
+      if (!node.x || !node.y) return
+      
+      // Determine size to calculate offset
+      let size = node.size || 10
+      if (node.type === 'central') size = 28
+      if (node === highlightedNode) size *= 1.5
+      if (node === hoveredNode) size *= 1.2
+      
+      const fontSize = node.type === 'central' ? 16 : 12
       
       // Use consistent font with the rest of the site
       ctx.font = `700 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`
@@ -271,23 +312,11 @@ const GraphSection = () => {
       ctx.textBaseline = 'middle'
       
       // Text position with better spacing
-      const labelY = node.y - size - 18
+      const labelY = node.y - size - 14
       
-      // Multiple stroke passes for better outline quality
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)'
-      ctx.lineWidth = 5
-      ctx.lineJoin = 'round'
-      ctx.miterLimit = 2
-      ctx.strokeText(node.name, node.x, labelY)
-      
-      // Additional thinner stroke for smoothness
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)'
-      ctx.lineWidth = 3
-      ctx.strokeText(node.name, node.x, labelY)
-      
-      // White fill with subtle shadow
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-      ctx.shadowBlur = 4
+      // White fill with subtle shadow (no stroke)
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
+      ctx.shadowBlur = 6
       ctx.shadowOffsetY = 2
       ctx.fillStyle = '#F5F5F5'
       ctx.fillText(node.name, node.x, labelY)
@@ -295,7 +324,7 @@ const GraphSection = () => {
       // Reset shadow
       ctx.shadowBlur = 0
       ctx.shadowOffsetY = 0
-    }
+    })
   }
 
   return (
@@ -320,11 +349,11 @@ const GraphSection = () => {
                 return categoryColors[node.category] || '#6B7FD7'
               }}
               nodeVal={node => {
-                let baseSize = node.size || 12
+                let baseSize = node.size || 10
                 // Central node is always larger
                 if (node.type === 'central') return baseSize
                 // Highlighted node is much larger
-                if (node === highlightedNode) baseSize *= 2.5
+                if (node === highlightedNode) baseSize *= 1.5
                 // Hovered node is slightly larger
                 if (node === hoveredNode) baseSize *= 1.2
                 return baseSize
@@ -340,6 +369,7 @@ const GraphSection = () => {
               onNodeDragEnd={handleNodeDrag}
               nodeCanvasObject={paintNode}
               nodeCanvasObjectMode={() => 'replace'}
+              onRenderFramePost={paintLabels}
               linkDirectionalArrowLength={0}
               cooldownTicks={300} // Even longer cooldown for smoother settling
               warmupTicks={200}
@@ -350,16 +380,16 @@ const GraphSection = () => {
               // Direct d3Force prop configuration with function
               d3Force={(forceName, force) => {
                 if (forceName === 'charge') {
-                  // Configure charge force
-                  force.strength(-1000).distanceMax(600)
+                  // Configure charge force - stronger forcefield
+                  force.strength(-500).distanceMax(600)
                 }
                 if (forceName === 'link') {
                   // Configure link force
                   force.distance(180).strength(0.05)
                 }
                 if (forceName === 'center') {
-                   // Configure center force
-                   force.strength(0.01)
+                   // Configure center force - increased for stronger pull to center
+                   force.strength(0.06)
                 }
                 // Add vertical compression force to create oval/landscape spread
                 if (forceName === 'vertical-compression') {
@@ -369,15 +399,15 @@ const GraphSection = () => {
                 if (forceName === 'collision') {
                   return d3.forceCollide()
                     .radius(node => {
-                      let size = node.size || 12
+                      let size = node.size || 10
                       // Central node needs much larger collision radius
                       if (node.type === 'central') return size + 35
-                      if (node === highlightedNode) size *= 2.5
+                      if (node === highlightedNode) size *= 1.5
                       if (node === hoveredNode) size *= 1.2
                       return size + 20 // Moderate buffer
                     })
-                    .strength(0.5)
-                    .iterations(2)
+                    .strength(0.8)
+                    .iterations(3)
                 }
               }}
               onEngineStop={() => {
@@ -388,15 +418,15 @@ const GraphSection = () => {
                   // Add collision force manually
                   const simulation = graphRef.current.d3Force('collision', d3.forceCollide()
                     .radius(node => {
-                      let size = node.size || 12
+                      let size = node.size || 10
                       // Central node needs much larger collision radius
                       if (node.type === 'central') return size + 40
-                      if (node === highlightedNode) size *= 2.5
+                      if (node === highlightedNode) size *= 1.5
                       if (node === hoveredNode) size *= 1.2
                       return size + 20 // Moderate buffer
                     })
-                    .strength(0.5)
-                    .iterations(2)
+                    .strength(0.8)
+                    .iterations(3)
                   )
                   
                   // Re-heat simulation
