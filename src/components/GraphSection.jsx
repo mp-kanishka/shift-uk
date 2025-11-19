@@ -14,20 +14,20 @@ const GraphSection = () => {
   const graphRef = useRef(null)
   const isInView = useInView(sectionRef, { amount: 0.2 })
 
-  // Colour mapping for categories
-  const categoryColors = {
-    Research: '#6B7FD7',
-    Industry: '#4A90E2',
-    Healthcare: '#E74C3C',
-    Education: '#F39C12',
-    Infrastructure: '#9B59B6',
-    Startup: '#1ABC9C',
-    Defence: '#E67E22',
-    Energy: '#16A085',
-    Creative: '#E91E63',
-    Legal: '#3498DB',
-    Entertainment: '#9C27B0'
-  }
+  // Color palette - variations on C8102E (red), 00A3E8 (blue), F5F5F5 (light)
+  const colorPalette = [
+    '#00A3E8',      // Base blue
+    '#0088C7',       // Darker blue
+    '#C8102E',       // Base red
+    '#E03A4F',       // Lighter red
+    '#4DB8E8',       // Light blue
+    '#B80D2E',       // Darker red
+    '#66C4F0',       // Very light blue
+    '#A00E28',       // Dark red
+    '#F5F5F5',       // Light gray/white
+    '#1A7AA8',       // Deep blue
+    '#D4D4D4'        // Light gray variation
+  ]
 
   useEffect(() => {
     // Load CSV data
@@ -59,14 +59,15 @@ const GraphSection = () => {
             results.data.forEach((row, index) => {
               const category = row.Category || 'General'
               
-              // Create investment node
+              // Create investment node with random color
               const node = {
                 id: `investment-${index}`,
                 name: row.Title || row.Name || 'Investment',
                 description: row.Description || '',
                 category: category,
                 type: 'investment',
-                size: 8 + Math.random() * 5 // Random size variation 8-13px (reduced from 10-18px)
+                size: 8 + Math.random() * 5, // Random size variation 8-13px (reduced from 10-18px)
+                color: colorPalette[Math.floor(Math.random() * colorPalette.length)] // Random color assignment
               }
               
               nodes.push(node)
@@ -98,10 +99,10 @@ const GraphSection = () => {
               graphRef.current.d3Force('radial', null)
               
               // Strong vertical compression for oval shape
-              graphRef.current.d3Force('y-compression', d3.forceY().strength(0.2))
+              graphRef.current.d3Force('y-compression', d3.forceY().strength(0.25))
               
-              // Weak horizontal compression to fill width
-              graphRef.current.d3Force('x-compression', d3.forceX().strength(0.05))
+              // Horizontal compression to spread out width (increased for more oval shape)
+              graphRef.current.d3Force('x-compression', d3.forceX().strength(0.02))
               
               // Collision force to prevent overlaps
               graphRef.current.d3Force('collision', d3.forceCollide()
@@ -169,6 +170,28 @@ const GraphSection = () => {
     }
   }
 
+  const handleNodeDragEnd = (node) => {
+    // Prevent dragging of central node
+    if (node.type === 'central') {
+      node.fx = 0
+      node.fy = 0
+    } else {
+      // Validate and ensure node coordinates are valid numbers
+      if (typeof node.x !== 'number' || isNaN(node.x) || typeof node.y !== 'number' || isNaN(node.y)) {
+        // Reset to center if coordinates are invalid
+        node.x = 0
+        node.y = 0
+      }
+      // Release fixed position after dragging so forces can work again
+      node.fx = undefined
+      node.fy = undefined
+    }
+    // Refresh the graph to ensure proper rendering
+    if (graphRef.current) {
+      graphRef.current.refresh()
+    }
+  }
+
   const paintNode = (node, ctx) => {
     if (!node.x || !node.y) return // Safety check
     
@@ -191,7 +214,8 @@ const GraphSection = () => {
       categoryColor = '#012169' // UK flag blue
       isUKFlag = true
     } else {
-      categoryColor = categoryColors[node.category] || '#6B7FD7'
+      // Use the randomly assigned color on the node
+      categoryColor = node.color || '#00A3E8'
     }
     
     const color = node === hoveredNode ? '#FFFFFF' : categoryColor
@@ -312,7 +336,7 @@ const GraphSection = () => {
       if (node === highlightedNode) size *= 1.5
       if (node === hoveredNode) size *= 1.2
       
-      const fontSize = node.type === 'central' ? 16 : 12
+      const fontSize = node.type === 'central' ? 12 : 8
       
       // Use consistent font with the rest of the site
       ctx.font = `700 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`
@@ -356,7 +380,7 @@ const GraphSection = () => {
               nodeColor={node => {
                 if (node === hoveredNode) return '#FFFFFF'
                 if (node.type === 'central') return '#012169'
-                return categoryColors[node.category] || '#6B7FD7'
+                return node.color || '#00A3E8'
               }}
               nodeVal={node => {
                 let baseSize = node.size || 10
@@ -376,7 +400,7 @@ const GraphSection = () => {
               onNodeClick={handleNodeClick}
               onNodeHover={setHoveredNode}
               onNodeDrag={handleNodeDrag}
-              onNodeDragEnd={handleNodeDrag}
+              onNodeDragEnd={handleNodeDragEnd}
               nodeCanvasObject={paintNode}
               nodeCanvasObjectMode={() => 'replace'}
               onRenderFramePost={paintLabels}
@@ -394,20 +418,20 @@ const GraphSection = () => {
                   force.strength(-500).distanceMax(600)
                 }
                 if (forceName === 'link') {
-                  // Configure link force
-                  force.distance(180).strength(0.05)
+                  // Configure link force - increased distance for more horizontal spread
+                  force.distance(250).strength(0.05)
                 }
                 if (forceName === 'center') {
-                   // Configure center force - increased for stronger pull to center
-                   force.strength(0.05)
+                   // Configure center force - reduced to allow more horizontal spread
+                   force.strength(0.02)
                 }
                 // Add vertical compression force to create oval/landscape spread
                 if (forceName === 'y-compression') {
-                  return d3.forceY().strength(0.2)
+                  return d3.forceY().strength(0.25)
                 }
-                // Add horizontal compression
+                // Add horizontal compression (weaker to allow more spread)
                 if (forceName === 'x-compression') {
-                  return d3.forceX().strength(0.05)
+                  return d3.forceX().strength(0.02)
                 }
                 // Add collision force to prevent overlaps
                 if (forceName === 'collision') {
@@ -428,8 +452,8 @@ const GraphSection = () => {
                 // Optional: Ensure forces are maintained if needed, but don't re-heat or zoom here
                 if (graphRef.current) {
                   // Re-apply forces to ensure stability without restarting simulation loop
-                  graphRef.current.d3Force('y-compression', d3.forceY().strength(0.2))
-                  graphRef.current.d3Force('x-compression', d3.forceX().strength(0.05))
+                  graphRef.current.d3Force('y-compression', d3.forceY().strength(0.25))
+                  graphRef.current.d3Force('x-compression', d3.forceX().strength(0.02))
                 }
               }}
               // ZOOM_PAN_DISABLED: Set these to true to re-enable zoom and pan
