@@ -55,7 +55,7 @@ const HeroSection = () => {
 
   // Calculate font size and letter spacing based on eased scroll progress
   // Make it grow large enough to exit frame completely
-  const fontSize = 6 + (scrollProgress * 95) // Grows from 6rem to 101rem
+  const fontSize = 7 + (scrollProgress * 95) // Grows from 7rem to 102rem (increased base size)
   const letterSpacing = 0.1 + (scrollProgress * 4) // Grows from 0.1rem to 4.1rem
   const scale = 1 + (scrollProgress * 7) // Additional scale effect
   const translateY = scrollProgress * -300 // Move up as it grows
@@ -107,7 +107,7 @@ const HeroSection = () => {
             } : {}
           }
         >
-          UK Tech is moving at 100mph
+          UK tech is moving at 100 miles an hour,<br />we're building a dashboard to track the pace
         </div>
       </div>
     </section>

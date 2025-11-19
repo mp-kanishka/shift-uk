@@ -4,6 +4,15 @@
   z-index: 1;
 }
 
+@keyframes bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
 .stats-sticky-container {
   position: sticky;
   top: 0;
@@ -67,12 +76,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: -15rem; /* Shift blue circle to the left */
+  position: relative; /* For absolute positioning of secondary circle */
 }
 
 .stat-circle {
   width: 400px;
   height: 400px;
-  background-color: #00A3E8;
+  background: rgba(0, 163, 232, 0.5); /* More vibrant blue */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(0, 163, 232, 0.6);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -83,8 +97,101 @@
   font-size: 2rem;
   font-weight: 700;
   line-height: 1.4;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 0 60px rgba(0, 163, 232, 0.5);
+  position: relative; /* Ensure it's above the secondary circle */
+  z-index: 2;
+  overflow: hidden;
+  animation: bob 4s ease-in-out infinite;
 }
+
+.stat-circle::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 163, 232, 0.4) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1; /* Behind the text */
+}
+
+.stat-circle .stat-content {
+  position: relative;
+  z-index: 2; /* Above the glow overlay */
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Add text shadow for better readability */
+}
+
+.stat-circle-secondary {
+  position: absolute;
+  left: -500px; /* Position further to the left of the main circle */
+  top: -180px; /* Position higher up */
+  width: 250px;
+  height: 250px;
+  background: rgba(0, 163, 232, 0.5); /* More vibrant blue */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(0, 163, 232, 0.6);
+  border-radius: 50%;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 0 50px rgba(0, 163, 232, 0.5);
+  opacity: 0.85;
+  z-index: 1;
+  overflow: hidden;
+  animation: bob 5s ease-in-out infinite;
+  animation-delay: 0.5s; /* Offset animation for variety */
+}
+
+.stat-circle-secondary::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 163, 232, 0.4) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.stat-circle-tertiary {
+  position: absolute;
+  left: -380px;
+  top: 300px;
+  width: 200px;
+  height: 200px;
+  background: rgba(0, 163, 232, 0.5); /* More vibrant blue */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(0, 163, 232, 0.6);
+  border-radius: 50%;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 0 50px rgba(0, 163, 232, 0.5);
+  opacity: 0.85;
+  z-index: 1;
+  overflow: hidden;
+  animation: bob 4.5s ease-in-out infinite;
+  animation-delay: 1s; /* Different delay for variety */
+}
+
+.stat-circle-tertiary::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 163, 232, 0.4) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+
 
 @media (max-width: 768px) {
   .horizontal-scroll-track {

@@ -61,14 +61,14 @@ const StatsSection = () => {
         // It stops being sticky when the bottom hits bottom (rect.bottom <= windowHeight)
         
         // We define snap points based on scroll depth into the section
-        // Start of section (Hero fade out done): roughly 200vh from top of page
+        // Start of section (Hero fade out done): roughly 150vh from top of page
         // We want to snap to:
         // 1. The Red Box (start of stats scroll)
         // 2. The Blue Circle (further down stats scroll)
         
         // Let's define snap points relative to the document
-        // The section starts after the hero wrapper (200vh)
-        const sectionStart = windowHeight * 2; 
+        // The section starts after the hero wrapper (150vh)
+        const sectionStart = windowHeight * 1.5; 
         
         // Snap point 1: Red Box (approx 200vh + some buffer)
         const snapPoint1 = sectionStart + windowHeight * 0.2;
@@ -132,6 +132,8 @@ const StatsSection = () => {
 
           {/* Blue Circle - "We've produced more unicorns..." */}
           <div className="stat-item blue-circle-container">
+            <div className="stat-circle-secondary"></div>
+            <div className="stat-circle-tertiary"></div>
             <div className="stat-circle">
               <div className="stat-content">
                 We've produced more unicorns than France and Germany combined

@@ -125,7 +125,7 @@
 
 /* Hero wrapper to create scroll space */
 .hero-wrapper {
-  height: 200vh; /* Double viewport - allows hero to stick then scroll away */
+  height: 150vh; /* Reduced from 200vh to decrease scroll distance */
   position: relative;
   z-index: 1;
 }
