@@ -1,22 +1,21 @@
-Title,Description,Category
-AI Research Hub,Advanced AI research facility focusing on healthcare applications,Research
-Quantum Computing Centre,State-of-the-art quantum computing research centre,Research
-AI Innovation Lab,Microsoft's UK AI innovation laboratory,Industry
-Autonomous Vehicle Testing,Testing facility for autonomous vehicle technology,Industry
-AI Ethics Institute,Research institute dedicated to AI ethics and governance,Research
-FinTech AI Platform,AI-powered financial services platform,Industry
-AI Manufacturing Hub,AI integration in automotive manufacturing,Industry
-NHS AI Diagnostic Centre,AI-powered diagnostic centre for NHS,Healthcare
-AI Education Platform,Educational platform for AI literacy,Education
-Smart City Initiative,AI-powered smart city infrastructure project,Infrastructure
-AI Start-up Accelerator,Accelerator programme for AI start-ups,Startup
-Robotics Research Lab,Advanced robotics research laboratory,Research
-AI Data Centre,Cloud infrastructure for AI workloads,Infrastructure
-AI in Agriculture,AI applications in agricultural technology,Industry
-Cybersecurity AI Lab,AI-powered cybersecurity research facility,Defence
-AI Talent Programme,National programme to develop AI talent,Education
-AI in Energy,AI optimisation for energy grid management,Energy
-Creative AI Studio,AI tools for creative industries,Creative
-AI Legal Tech,AI applications in legal services,Legal
-AI Gaming Studio,AI development for gaming industry,Entertainment
-
+Title,Description,Category,Date
+AI Research Hub,Advanced AI research facility focusing on healthcare applications,Research,Nov 2023
+Quantum Computing Centre,State-of-the-art quantum computing research centre,Research,Jan 2024
+AI Innovation Lab,Microsoft's UK AI innovation laboratory,Industry,Feb 2024
+Autonomous Vehicle Testing,Testing facility for autonomous vehicle technology,Industry,Mar 2024
+AI Ethics Institute,Research institute dedicated to AI ethics and governance,Research,Oct 2023
+FinTech AI Platform,AI-powered financial services platform,Industry,Dec 2023
+AI Manufacturing Hub,AI integration in automotive manufacturing,Industry,Apr 2024
+NHS AI Diagnostic Centre,AI-powered diagnostic centre for NHS,Healthcare,Sep 2023
+AI Education Platform,Educational platform for AI literacy,Education,May 2024
+Smart City Initiative,AI-powered smart city infrastructure project,Infrastructure,Aug 2023
+AI Start-up Accelerator,Accelerator programme for AI start-ups,Startup,Jun 2024
+Robotics Research Lab,Advanced robotics research laboratory,Research,Jul 2024
+AI Data Centre,Cloud infrastructure for AI workloads,Infrastructure,Mar 2024
+AI in Agriculture,AI applications in agricultural technology,Industry,Apr 2024
+Cybersecurity AI Lab,AI-powered cybersecurity research facility,Defence,Nov 2023
+AI Talent Programme,National programme to develop AI talent,Education,Jan 2024
+AI in Energy,AI optimisation for energy grid management,Energy,Feb 2024
+Creative AI Studio,AI tools for creative industries,Creative,May 2024
+AI Legal Tech,AI applications in legal services,Legal,Jun 2024
+AI Gaming Studio,AI development for gaming industry,Entertainment,Jul 2024

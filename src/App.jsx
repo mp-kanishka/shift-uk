@@ -26,14 +26,32 @@ function App() {
       const greyToBlueStart = statsSectionStart + (windowHeight * 0.2) // Start when red box is visible
       const greyToBlueEnd = statsSectionStart + (windowHeight * 1.0) // Complete when blue circle is centered
       
+      // Transition 3: Blue (#012169) to Grey (#1E1E1E) - entering Unicorns section
+      // Unicorns section starts at 450vh (150 + 300)
+      const unicornsSectionStart = windowHeight * 4.5
+      const blueToGrey2Start = unicornsSectionStart - (windowHeight * 0.5)
+      const blueToGrey2End = unicornsSectionStart
+      
+      // Transition 4: Grey (#1E1E1E) to Blue (#012169) - entering Graph section
+      // Graph section starts at 600vh (450 + 150)
+      const graphSectionStart = windowHeight * 6.0
+      const greyToBlue3Start = graphSectionStart - (windowHeight * 0.5)
+      const greyToBlue3End = graphSectionStart
+
       if (scrollY <= heroToStatsStart) {
         // Still in hero section - blue
         setBgColor('#012169')
       } else if (scrollY >= heroToStatsEnd && scrollY < greyToBlueStart) {
         // In stats section, before grey-to-blue transition - grey
         setBgColor('#1E1E1E')
-      } else if (scrollY >= greyToBlueEnd) {
-        // Past stats section transition - blue
+      } else if (scrollY >= greyToBlueEnd && scrollY < blueToGrey2Start) {
+        // Past stats section transition (Blue circle part) - blue
+        setBgColor('#012169')
+      } else if (scrollY >= blueToGrey2End && scrollY < greyToBlue3Start) {
+        // In Unicorns section - grey
+        setBgColor('#1E1E1E')
+      } else if (scrollY >= greyToBlue3End) {
+        // Graph section - blue
         setBgColor('#012169')
       } else if (scrollY >= heroToStatsStart && scrollY < heroToStatsEnd) {
         // Transition 1: Blue to Grey
@@ -50,6 +68,30 @@ function App() {
       } else if (scrollY >= greyToBlueStart && scrollY < greyToBlueEnd) {
         // Transition 2: Grey to Blue
         const progress = (scrollY - greyToBlueStart) / (greyToBlueEnd - greyToBlueStart)
+        
+        const startR = 30, startG = 30, startB = 30 // #1E1E1E
+        const endR = 1, endG = 33, endB = 105 // #012169
+        
+        const r = Math.round(startR + (endR - startR) * progress)
+        const g = Math.round(startG + (endG - startG) * progress)
+        const b = Math.round(startB + (endB - startB) * progress)
+        
+        setBgColor(`rgb(${r}, ${g}, ${b})`)
+      } else if (scrollY >= blueToGrey2Start && scrollY < blueToGrey2End) {
+        // Transition 3: Blue to Grey (Unicorns)
+        const progress = (scrollY - blueToGrey2Start) / (blueToGrey2End - blueToGrey2Start)
+        
+        const startR = 1, startG = 33, startB = 105 // #012169
+        const endR = 30, endG = 30, endB = 30 // #1E1E1E
+        
+        const r = Math.round(startR + (endR - startR) * progress)
+        const g = Math.round(startG + (endG - startG) * progress)
+        const b = Math.round(startB + (endB - startB) * progress)
+        
+        setBgColor(`rgb(${r}, ${g}, ${b})`)
+      } else if (scrollY >= greyToBlue3Start && scrollY < greyToBlue3End) {
+        // Transition 4: Grey to Blue (Graph)
+        const progress = (scrollY - greyToBlue3Start) / (greyToBlue3End - greyToBlue3Start)
         
         const startR = 30, startG = 30, startB = 30 // #1E1E1E
         const endR = 1, endG = 33, endB = 105 // #012169

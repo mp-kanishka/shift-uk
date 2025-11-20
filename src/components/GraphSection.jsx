@@ -9,6 +9,8 @@ const GraphSection = () => {
   const [graphData, setGraphData] = useState({ nodes: [], links: [] })
   const [selectedNode, setSelectedNode] = useState(null)
   const [hoveredNode, setHoveredNode] = useState(null)
+  const [isHoverPaused, setIsHoverPaused] = useState(false)
+  const hoverTimeoutRef = useRef(null)
   const [highlightedNode, setHighlightedNode] = useState(null)
   const sectionRef = useRef(null)
   const graphRef = useRef(null)
@@ -65,6 +67,7 @@ const GraphSection = () => {
                 name: row.Title || row.Name || 'Investment',
                 description: row.Description || '',
                 category: category,
+                date: row.Date || '',
                 type: 'investment',
                 size: 8 + Math.random() * 5, // Random size variation 8-13px (reduced from 10-18px)
                 color: colorPalette[Math.floor(Math.random() * colorPalette.length)] // Random color assignment
@@ -154,6 +157,28 @@ const GraphSection = () => {
     }
   }, [graphData])
 
+  const handleNodeHover = (node) => {
+    setHoveredNode(node)
+    
+    if (node) {
+      // When hovering a node, pause the highlight effect immediately
+      setIsHoverPaused(true)
+      // Clear any pending timeout
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current)
+        hoverTimeoutRef.current = null
+      }
+    } else {
+      // When unhovering, set a timeout to resume highlight effect after 3 seconds
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current)
+      }
+      hoverTimeoutRef.current = setTimeout(() => {
+        setIsHoverPaused(false)
+      }, 3000)
+    }
+  }
+
   const handleNodeClick = (node) => {
     // Don't show popup for central node
     if (node.type === 'central') {
@@ -199,12 +224,18 @@ const GraphSection = () => {
     let baseSize = node.size || 10
     
     // Make highlighted node larger with smooth animation
-    if (node === highlightedNode) {
-      baseSize = baseSize * 1.5 // Highlighted nodes are 50% larger (reduced from 150%)
+    // Also apply this style to the selected node
+    // BUT if we are hovering over ANY node, de-highlight the highlighted node (unless it is the selected node)
+    // User wanted: "when hovering over a node dehilight the hilighted node"
+    // And "give it 3 seconds after unhoverning over a node to show the hilighted node again"
+    const isActive = (node === highlightedNode && !isHoverPaused) || node === selectedNode;
+    
+    if (isActive) {
+      baseSize = baseSize * 1.3 // Reduced from 1.5
     }
     
-    // Hover makes it slightly larger
-    const size = node === hoveredNode ? baseSize * 1.2 : baseSize
+    // Hover size - user requested "dont make it bigger"
+    const size = baseSize
     
     // Determine colours based on category or node type
     let categoryColor, isUKFlag = false
@@ -226,16 +257,21 @@ const GraphSection = () => {
       g: parseInt(categoryColor.slice(3, 5), 16),
       b: parseInt(categoryColor.slice(5, 7), 16)
     }
-            const glowColorRgba = node === hoveredNode || node === highlightedNode 
+            // User requested "dont have more blur" on hover -> Wait, new request: "when hovering over a node give it a little more glow"
+            // So we keep high opacity for hovered node
+            const isHovered = node === hoveredNode;
+            const glowColorRgba = (isActive || isHovered)
               ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.9)` 
               : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)` // Reduced glow opacity for regular nodes
             
             // Draw glow effect
-            const glowSize = node === highlightedNode ? size * 3 : size * 2 // Reduced glow radius for regular nodes
+            // User requested "reduce the glow increase of the hlighted node"
+            // User requested "when hovering over a node give it a little more glow"
+            const glowSize = (isActive || isHovered) ? size * 2.5 : size * 2 // Reduced active/hovered glow from 3 to 2.5
             const glowGradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, glowSize)
             
             glowGradient.addColorStop(0, glowColorRgba)
-            if (node === highlightedNode) {
+            if (isActive || isHovered) {
               glowGradient.addColorStop(0.4, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`)
             } else {
               glowGradient.addColorStop(0.5, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`)
@@ -299,7 +335,8 @@ const GraphSection = () => {
               ctx.stroke()
             }
     
-    // Draw selection ring
+    // Remove the old blue ring selection style
+    /* 
     if (node === selectedNode) {
       ctx.beginPath()
       ctx.arc(node.x, node.y, size + 4, 0, 2 * Math.PI, false)
@@ -310,6 +347,7 @@ const GraphSection = () => {
       ctx.stroke()
       ctx.shadowBlur = 0
     }
+    */
   }
 
   const paintLabels = (ctx, globalScale) => {
@@ -323,8 +361,10 @@ const GraphSection = () => {
     if (centralNode) nodesToLabel.push(centralNode)
     
     // Add interacted nodes (avoiding duplicates)
-    if (highlightedNode && highlightedNode !== centralNode) nodesToLabel.push(highlightedNode)
-    if (selectedNode && selectedNode !== centralNode && selectedNode !== highlightedNode) nodesToLabel.push(selectedNode)
+    // Hide highlighted node title if a popup is open (selectedNode is set) OR if hovering over any node (isHoverPaused)
+    if (highlightedNode && highlightedNode !== centralNode && !selectedNode && !isHoverPaused) nodesToLabel.push(highlightedNode)
+    
+    if (selectedNode && selectedNode !== centralNode) nodesToLabel.push(selectedNode)
     if (hoveredNode && hoveredNode !== centralNode && hoveredNode !== highlightedNode && hoveredNode !== selectedNode) nodesToLabel.push(hoveredNode)
     
     nodesToLabel.forEach(node => {
@@ -338,8 +378,11 @@ const GraphSection = () => {
       
       const fontSize = node.type === 'central' ? 12 : 8
       
+      // Highlight/Select font size slightly larger
+      const finalFontSize = (node === highlightedNode || node === selectedNode) && node.type !== 'central' ? 8 : fontSize
+      
       // Use consistent font with the rest of the site
-      ctx.font = `700 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`
+      ctx.font = `700 ${finalFontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`
       
       // High quality text rendering
       ctx.textAlign = 'center'
@@ -398,7 +441,7 @@ const GraphSection = () => {
               linkDirectionalParticleSpeed={0.01}
               linkDirectionalParticleWidth={2}
               onNodeClick={handleNodeClick}
-              onNodeHover={setHoveredNode}
+              onNodeHover={handleNodeHover}
               onNodeDrag={handleNodeDrag}
               onNodeDragEnd={handleNodeDragEnd}
               nodeCanvasObject={paintNode}
@@ -465,18 +508,25 @@ const GraphSection = () => {
           )}
         </div>
         {selectedNode && (
-          <motion.div
-            className="node-details"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-          >
-            <button className="close-button" onClick={() => setSelectedNode(null)}>×</button>
-            <h3>{selectedNode.name}</h3>
-            {selectedNode.description && (
-              <p className="description">{selectedNode.description}</p>
-            )}
-          </motion.div>
+          <div className="popup-overlay" onClick={() => setSelectedNode(null)}>
+            <motion.div
+              className="node-details-popup"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the popup itself
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <button className="close-button" onClick={() => setSelectedNode(null)}>×</button>
+              <div className="popup-header">
+                {selectedNode.date && <span className="popup-date">{selectedNode.date}</span>}
+              </div>
+              <h3>{selectedNode.name}</h3>
+              {selectedNode.description && (
+                <p className="description">{selectedNode.description}</p>
+              )}
+            </motion.div>
+          </div>
         )}
       </motion.div>
     </section>
