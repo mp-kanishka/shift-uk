@@ -44,7 +44,8 @@ const GraphSection = () => {
             const links = []
             const categoryGroups = {}
 
-            // Add central "UK AI" node first
+            // Central node removed
+            /*
             const centralNode = {
               id: 'central-uk-ai',
               name: 'UK AI',
@@ -56,8 +57,9 @@ const GraphSection = () => {
               fy: 0  // Fixed y position at center
             }
             nodes.push(centralNode)
+            */
 
-            // Create investment nodes and link each to central node
+            // Create investment nodes
             results.data.forEach((row, index) => {
               const category = row.Category || 'General'
               
@@ -75,13 +77,46 @@ const GraphSection = () => {
               
               nodes.push(node)
               
-              // Link EVERY investment node to central node
-              links.push({
-                source: 'central-uk-ai',
-                target: node.id,
-                value: 1 // Standard link strength
-              })
+              // No default links to central node
             })
+
+            // Generate random connections (min 2 per node)
+            const linkExists = (source, target) => {
+                return links.some(l => 
+                    (l.source === source && l.target === target) || 
+                    (l.source === target && l.target === source)
+                )
+            }
+
+            const connectionCounts = new Map(nodes.map(n => [n.id, 0]))
+
+            nodes.forEach(sourceNode => {
+                let safety = 0
+                while (connectionCounts.get(sourceNode.id) < 2 && safety < 100) {
+                    const targetNode = nodes[Math.floor(Math.random() * nodes.length)]
+                    
+                    if (sourceNode.id !== targetNode.id && !linkExists(sourceNode.id, targetNode.id)) {
+                        links.push({
+                            source: sourceNode.id,
+                            target: targetNode.id,
+                            value: 1
+                        })
+                        connectionCounts.set(sourceNode.id, connectionCounts.get(sourceNode.id) + 1)
+                        connectionCounts.set(targetNode.id, connectionCounts.get(targetNode.id) + 1)
+                    }
+                    safety++
+                }
+            })
+            
+            // Add a small amount of extra random connections for better mesh density
+            const extraLinks = Math.floor(nodes.length * 0.3) // 30% extra edges
+            for (let i = 0; i < extraLinks; i++) {
+                 const source = nodes[Math.floor(Math.random() * nodes.length)]
+                 const target = nodes[Math.floor(Math.random() * nodes.length)]
+                 if (source.id !== target.id && !linkExists(source.id, target.id)) {
+                     links.push({ source: source.id, target: target.id, value: 1 })
+                 }
+            }
 
             setGraphData({ nodes, links })
           }
@@ -376,10 +411,10 @@ const GraphSection = () => {
       if (node === highlightedNode) size *= 1.5
       if (node === hoveredNode) size *= 1.2
       
-      const fontSize = node.type === 'central' ? 12 : 8
+      const fontSize = node.type === 'central' ? 10 : 7
       
-      // Highlight/Select font size slightly larger
-      const finalFontSize = (node === highlightedNode || node === selectedNode) && node.type !== 'central' ? 8 : fontSize
+      // Highlight/Select font size
+      const finalFontSize = (node === highlightedNode || node === selectedNode) && node.type !== 'central' ? 7 : fontSize
       
       // Use consistent font with the rest of the site
       ctx.font = `700 ${finalFontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`
@@ -388,8 +423,8 @@ const GraphSection = () => {
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       
-      // Text position with better spacing
-      const labelY = node.y - size - 14
+      // Text position with better spacing (moved closer to node)
+      const labelY = node.y - size - 5
       
       // White fill with subtle shadow (no stroke)
       ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
