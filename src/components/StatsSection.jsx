@@ -118,11 +118,11 @@ const StatsSection = () => {
       <div className="stats-sticky-container">
         <div className="horizontal-scroll-track" style={{ transform: `translateX(-${shiftAmount}vw)` }}>
           
-          {/* Red Box - "The UK has the largest tech economy..." */}
+          {/* Red Box - "We have the largest tech economy..." */}
           <div className="stat-item red-box-group">
             <div className="red-box">
               <div className="stat-content">
-                The UK has the largest tech economy in Europe, and third largest in the world
+                We have the largest tech economy in Europe, and third largest in the world
               </div>
             </div>
             <img 

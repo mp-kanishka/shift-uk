@@ -126,6 +126,15 @@
   }
 }
 
+.hero-animation {
+  width: 600px;
+  height: 600px;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+  transition: none;
+}
+
 .hero-text {
   font-weight: 700;
   color: var(--text-primary);
@@ -171,6 +180,11 @@
 }
 
 @media (max-width: 768px) {
+  .hero-animation {
+    width: 300px;
+    height: 300px;
+  }
+
   .hero-subtitle {
     font-size: 1rem;
   }

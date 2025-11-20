@@ -7,6 +7,7 @@ const HeroSection = () => {
   const [showSubtitle, setShowSubtitle] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const sectionRef = useRef(null)
+  const animationRef = useRef(null)
 
   // Check for mobile
   useEffect(() => {
@@ -62,12 +63,15 @@ const HeroSection = () => {
     }
   }, [])
 
+  // Toggle to re-enable the oversized zoom effect if needed
+  const HERO_ZOOM_ENABLED = false
+
   // Calculate font size and letter spacing based on eased scroll progress
   // Make it grow large enough to exit frame completely
   const baseFontSize = isMobile ? 3 : 7
   const fontSize = baseFontSize + (scrollProgress * 95) // Grows from base size
   const letterSpacing = 0.1 + (scrollProgress * 4) // Grows from 0.1rem to 4.1rem
-  const scale = 1 + (scrollProgress * 7) // Additional scale effect
+  const zoomScale = HERO_ZOOM_ENABLED ? 1 + (scrollProgress * 7) : 1
   const translateY = scrollProgress * -300 // Move up as it grows
   
   // Smooth fade out as it exits frame (starts fading at 95% progress - let it fully exit first)
@@ -80,6 +84,32 @@ const HeroSection = () => {
   // Subtitle moves DOWN shorter distance and fades out faster
   const subtitleTranslateY = scrollProgress * 20 // Moves DOWN only 20px (shorter distance)
   const subtitleOpacity = rawProgress < 0.01 ? 1 : Math.max(0, 1 - ((rawProgress - 0.01) / 0.05)) // Fades out extremely quickly (by 6% scroll)
+
+  // Load Lottie animation
+  useEffect(() => {
+    if (!animationRef.current) return
+
+    const lottieLib = window?.lottie || window?.bodymovin
+    if (!lottieLib) {
+      console.warn('Lottie script not loaded yet')
+      return
+    }
+
+    const animationInstance = lottieLib.loadAnimation({
+      container: animationRef.current,
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      path: '/button-press.json',
+      rendererSettings: {
+        preserveAspectRatio: 'xMidYMid meet'
+      }
+    })
+
+    return () => {
+      animationInstance?.destroy()
+    }
+  }, [])
 
   return (
     <section 
@@ -94,18 +124,30 @@ const HeroSection = () => {
       }}
     >
       <div className="hero-content">
+        {/* Commented out - may bring back later
         <div 
           className="hero-text"
           style={{
             fontSize: `${fontSize}rem`,
             letterSpacing: `${letterSpacing}rem`,
             opacity: textOpacity,
-            transform: `translateY(${translateY}px) scale(${scale})`,
+            transform: `translateY(${translateY}px) scale(${zoomScale})`,
             transition: 'opacity 0.3s ease-out'
           }}
         >
           Vibeshift <span className="uk-text">UK</span>
         </div>
+        */}
+        <div
+          ref={animationRef}
+          className="hero-animation"
+          style={{
+            opacity: textOpacity,
+            transform: `translateY(${translateY}px) scale(${zoomScale})`,
+            transition: 'opacity 0.3s ease-out',
+            pointerEvents: 'none'
+          }}
+        />
         <div 
           className={`hero-subtitle ${showSubtitle ? 'show' : ''}`}
           style={
@@ -117,7 +159,9 @@ const HeroSection = () => {
             } : {}
           }
         >
-          UK tech is moving at 100 miles an hour,<br />we're building a dashboard to track the pace...
+          Politicians love to talk the UK down but it's time to reset the narrative,<br />
+          UK AI and tech is moving at 100mph.<br />
+          We're building a dashboard that tracks the UK AI story in realtime
         </div>
       </div>
     </section>

@@ -107,7 +107,7 @@
 
 .flag-france {
   left: -600px;
-  top: -100px;
+  top: 0px;
   width: 200px;
   height: 200px;
   animation: bob 5s ease-in-out infinite;
@@ -116,14 +116,14 @@
 
 .flag-germany {
   left: -500px;
-  top: 100px;
+  top: 200px;
   animation: bob 4.5s ease-in-out infinite;
   animation-delay: 1s;
 }
 
 .flag-uk {
   left: -400px;
-  top: -300px;
+  top: -200px;
   width: 350px;
   height: 350px;
   animation: bob 4s ease-in-out infinite;

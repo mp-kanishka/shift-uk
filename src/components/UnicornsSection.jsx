@@ -68,7 +68,7 @@ const UnicornsSection = () => {
             loading="lazy"
           />
           <p className="unicorns-text">
-            Over 160 + unicorns took their first steps in the United Kingdom
+            Over 160 unicorns took their first steps in the United Kingdom
           </p>
         </div>
       </div>

@@ -1,5 +1,5 @@
 .graph-section {
-  min-height: 100vh;
+  min-height: 90vh;
   padding: 0;
   background: transparent; /* Background now handled by shared-background */
   position: relative;
@@ -9,7 +9,7 @@
 
 .graph-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: 90vh;
   margin: 0;
   position: relative;
   z-index: 1;
@@ -30,8 +30,8 @@
 .graph-wrapper {
   width: 100%;
   flex: 1;
-  height: calc(100vh - 120px);
-  min-height: calc(100vh - 120px);
+  height: calc(90vh - 120px);
+  min-height: calc(90vh - 120px);
   position: relative;
   overflow: hidden;
 }
@@ -148,7 +148,7 @@
   }
   
   .graph-wrapper {
-    height: calc(100vh - 100px);
+    height: calc(90vh - 100px);
   }
   
   .node-details {
