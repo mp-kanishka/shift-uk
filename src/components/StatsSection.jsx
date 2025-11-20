@@ -43,6 +43,9 @@ const StatsSection = () => {
     let isScrolling;
     
     const handleScrollSnap = () => {
+      // Disable snap on mobile
+      if (window.innerWidth <= 768) return;
+
       window.clearTimeout(isScrolling);
 
       // Set a timeout to run after scrolling ends

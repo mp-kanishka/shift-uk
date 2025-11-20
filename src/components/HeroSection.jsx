@@ -5,7 +5,16 @@ const HeroSection = () => {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [rawProgress, setRawProgress] = useState(0)
   const [showSubtitle, setShowSubtitle] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const sectionRef = useRef(null)
+
+  // Check for mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // More aggressive ease-out for dramatic ramp
   const easeOutQuart = (t) => {
@@ -55,7 +64,8 @@ const HeroSection = () => {
 
   // Calculate font size and letter spacing based on eased scroll progress
   // Make it grow large enough to exit frame completely
-  const fontSize = 7 + (scrollProgress * 95) // Grows from 7rem to 102rem (increased base size)
+  const baseFontSize = isMobile ? 3 : 7
+  const fontSize = baseFontSize + (scrollProgress * 95) // Grows from base size
   const letterSpacing = 0.1 + (scrollProgress * 4) // Grows from 0.1rem to 4.1rem
   const scale = 1 + (scrollProgress * 7) // Additional scale effect
   const translateY = scrollProgress * -300 // Move up as it grows

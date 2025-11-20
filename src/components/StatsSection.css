@@ -132,30 +132,104 @@
 
 
 @media (max-width: 768px) {
+  .stats-section {
+    height: auto; /* Allow content to flow naturally */
+    min-height: auto;
+  }
+
+  .stats-sticky-container {
+    position: relative; /* Disable sticky behavior */
+    height: auto;
+    top: auto;
+    overflow: visible;
+    display: block;
+    padding: 4rem 0;
+  }
+
   .horizontal-scroll-track {
-    padding-left: 10vw;
-    width: 300vw;
+    /* Override JS transform with !important */
+    transform: none !important;
+    width: 100%;
+    padding: 0 1rem;
+    flex-direction: column;
+    gap: 6rem;
+    align-items: center;
   }
   
   .stat-item {
-    margin-right: 20vw;
+    margin-right: 0;
+    width: 100%;
+    flex-direction: column;
+    margin-bottom: 2rem;
   }
 
   .red-box-group {
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
+    align-items: center;
+    width: 100%;
   }
 
-  .red-box, .stat-circle {
-    width: 300px;
-    height: 300px; /* Make red box square on mobile for better fit */
+  .red-box {
+    width: 90%;
+    max-width: 350px;
+    height: auto;
+    aspect-ratio: 1.2;
     font-size: 1.5rem;
     padding: 2rem;
+    margin: 0 auto;
   }
 
   .europe-map {
-    width: min(80vw, 480px);
+    display: none;
+  }
+
+  .blue-circle-container {
     margin-left: 0;
+    width: 100%;
+    height: 500px; /* Space for flags and text */
+    margin-top: 0;
+  }
+
+  .flag-france {
+    left: 10%;
+    top: 180px;
+    width: 120px;
+    height: 120px;
+    animation: bob 5s ease-in-out infinite;
+  }
+
+  .flag-germany {
+    left: auto;
+    right: 10%;
+    top: 200px;
+    width: 120px;
+    height: 120px;
+    animation: bob 4.5s ease-in-out infinite;
+  }
+
+  .flag-uk {
+    left: 50%;
+    top: 0;
+    width: 180px;
+    height: 180px;
+    transform: translateX(-50%); /* Center horizontally */
+    animation: bob-center 4s ease-in-out infinite;
+  }
+  
+  .unicorns-stat-text {
+    margin-top: 400px; /* Push text below flags */
+    font-size: 1.8rem;
+    padding: 0 1rem;
+  }
+}
+
+@keyframes bob-center {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-15px);
   }
 }
 
