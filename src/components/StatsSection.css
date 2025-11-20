@@ -132,7 +132,7 @@
 
 
 
-@media (max-width: 768px) {
+@media (max-width: 1300px) {
   .stats-section {
     height: auto; /* Allow content to flow naturally */
     min-height: auto;

@@ -30,6 +30,40 @@ const GraphSection = () => {
     '#1A7AA8',       // Deep blue
     '#D4D4D4'        // Light gray variation
   ]
+  const defaultCategoryOrder = [
+    'Research',
+    'Industry',
+    'Healthcare',
+    'Education',
+    'Infrastructure',
+    'Startup',
+    'Defence',
+    'Energy',
+    'Creative',
+    'Legal',
+    'Entertainment'
+  ]
+
+  const getCategoryColor = (() => {
+    const assigned = new Map()
+    let paletteIndex = 0
+
+    return (category = 'General') => {
+      if (assigned.has(category)) return assigned.get(category)
+
+      let color
+      const defaultIndex = defaultCategoryOrder.indexOf(category)
+      if (defaultIndex !== -1) {
+        color = colorPalette[defaultIndex % colorPalette.length]
+      } else {
+        color = colorPalette[paletteIndex % colorPalette.length]
+        paletteIndex++
+      }
+
+      assigned.set(category, color)
+      return color
+    }
+  })()
 
   useEffect(() => {
     // Load CSV data
@@ -72,7 +106,7 @@ const GraphSection = () => {
                 date: row.Date || '',
                 type: 'investment',
                 size: 8 + Math.random() * 5, // Random size variation 8-13px (reduced from 10-18px)
-                color: colorPalette[Math.floor(Math.random() * colorPalette.length)] // Random color assignment
+                color: getCategoryColor(category)
               }
               
               nodes.push(node)
