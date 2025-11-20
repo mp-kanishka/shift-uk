@@ -61,12 +61,17 @@ const UnicornsSection = () => {
     <section ref={sectionRef} className="unicorns-section">
       <div className="unicorns-sticky-container">
         <div className="unicorns-content">
-          <img 
-            src="/uk.svg" 
-            alt="United Kingdom" 
-            className="uk-icon"
-            loading="lazy"
-          />
+          <div className="uk-visual-container">
+            <div className="number-overlay">
+              <span className="uk-masked-text">160+</span>
+            </div>
+            <img 
+              src="/uk.svg" 
+              alt="United Kingdom" 
+              className="uk-icon"
+              loading="lazy"
+            />
+          </div>
           <p className="unicorns-text">
             Over 160 unicorns took their first steps in the United Kingdom
           </p>

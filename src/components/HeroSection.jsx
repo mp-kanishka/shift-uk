@@ -159,9 +159,21 @@ const HeroSection = () => {
             } : {}
           }
         >
-          Politicians love to talk the UK down but it's time to reset the narrative,<br />
-          UK AI and tech is moving at 100mph.<br />
-          We're building a dashboard that tracks the UK AI story in realtime
+          Politicians love to talk the UK down but it's time to <strong>shift</strong> the narrative.<br />
+          UK AI and tech is moving at 100mph.
+        </div>
+        <div 
+          className={`hero-subtitle hero-subtitle-secondary ${showSubtitle ? 'show' : ''}`}
+          style={
+            rawProgress > 0 ? {
+              // Only apply scroll transforms after scrolling starts
+              opacity: subtitleOpacity,
+              transform: `translateY(${subtitleTranslateY}px)`,
+              transition: 'none'
+            } : {}
+          }
+        >
+          We're building a dashboard that tracks the UK AI story in realtime.
         </div>
       </div>
     </section>

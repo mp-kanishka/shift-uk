@@ -448,7 +448,10 @@ const GraphSection = () => {
         animate={isInView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 1 }}
       >
-        <h2 className="graph-title">UK AI Story...</h2>
+        <div className="graph-header">
+          <h2 className="graph-title">Tracking the UK AI story</h2>
+          <p className="graph-subtitle">We're making the UK the world's best AI deployment hub</p>
+        </div>
         <div className="graph-wrapper">
           {graphData.nodes.length > 0 && (
             <ForceGraph2D

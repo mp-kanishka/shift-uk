@@ -17,14 +17,25 @@
   flex-direction: column;
 }
 
+.graph-header {
+  text-align: center;
+  padding: 2rem 2rem 1rem;
+  position: relative;
+  z-index: 2;
+}
+
 .graph-title {
   font-size: 2.5rem;
   font-weight: 700;
-  text-align: center;
-  padding: 2rem 2rem 1rem;
   color: var(--text-primary);
-  position: relative;
-  z-index: 2;
+  margin: 0 0 0.5rem 0;
+}
+
+.graph-subtitle {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
 .graph-wrapper {
@@ -142,9 +153,16 @@
 }
 
 @media (max-width: 768px) {
+  .graph-header {
+    padding: 1.5rem 1rem 0.5rem;
+  }
+
   .graph-title {
     font-size: 1.8rem;
-    padding: 1.5rem 1rem 0.5rem;
+  }
+
+  .graph-subtitle {
+    font-size: 1rem;
   }
   
   .graph-wrapper {

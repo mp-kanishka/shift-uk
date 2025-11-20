@@ -180,6 +180,11 @@
   transform: translateY(0);
 }
 
+.hero-subtitle-secondary {
+  margin-top: 2rem;
+  font-size: 2rem;
+}
+
 @media (max-width: 768px) {
   .hero-animation {
     width: 300px;
@@ -188,6 +193,10 @@
   }
 
   .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-subtitle-secondary {
     font-size: 1rem;
   }
   

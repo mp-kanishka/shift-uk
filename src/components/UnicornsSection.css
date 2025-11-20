@@ -29,11 +29,45 @@
   padding-right: 5vw;
 }
 
+.uk-visual-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Add some right margin to push text slightly further */
+  margin-right: 2rem;
+}
+
+.number-overlay {
+  position: absolute;
+  left: -60px; /* Slightly back to the left */
+  bottom: 50px;
+  z-index: 2;
+}
+
+.uk-masked-text {
+  font-size: 10rem;
+  font-weight: 900;
+  line-height: 1;
+  /* Use the flag as a background */
+  background-image: url('/Flag_of_the_United_Kingdom.png');
+  background-size: cover;
+  background-position: center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  -webkit-text-fill-color: transparent;
+  /* Add a slight drop shadow for legibility */
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+}
+
 .uk-icon {
   width: 600px;
   height: auto;
   flex-shrink: 0;
   filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+  /* Move map further to the right */
+  transform: translateX(230px);
 }
 
 .unicorns-text {
@@ -54,8 +88,24 @@
     padding-right: 0;
   }
 
+  .uk-visual-container {
+    margin-right: 0;
+    /* Scale down the entire container on mobile */
+    transform: scale(0.7);
+  }
+  
   .uk-icon {
-    width: 250px;
+    width: 300px;
+    transform: translateX(130px); /* Further right on mobile */
+  }
+  
+  .number-overlay {
+    left: -40px; /* Slightly left on mobile */
+    bottom: 20px;
+  }
+  
+  .uk-masked-text {
+    font-size: 6rem;
   }
 
   .unicorns-text {
