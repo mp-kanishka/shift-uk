@@ -16,6 +16,15 @@ const GraphSection = () => {
   const graphRef = useRef(null)
   const isInView = useInView(sectionRef, { amount: 0.2 })
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check for mobile - specifically for graph forces (810px breakpoint)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 810)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Color palette - variations on C8102E (red), 00A3E8 (blue), F5F5F5 (light)
   const colorPalette = [
@@ -147,11 +156,13 @@ const GraphSection = () => {
               // Remove radial force to allow non-circular shape
               graphRef.current.d3Force('radial', null)
               
-              // Strong vertical compression for oval shape
-              graphRef.current.d3Force('y-compression', d3.forceY().strength(0.25))
+              // On mobile: vertical oval (weak y-compression, strong x-compression)
+              // On desktop: horizontal oval (strong y-compression, weak x-compression)
+              const yStrength = isMobile ? 0.02 : 0.25
+              const xStrength = isMobile ? 0.25 : 0.02
               
-              // Horizontal compression to spread out width (increased for more oval shape)
-              graphRef.current.d3Force('x-compression', d3.forceX().strength(0.02))
+              graphRef.current.d3Force('y-compression', d3.forceY().strength(yStrength))
+              graphRef.current.d3Force('x-compression', d3.forceX().strength(xStrength))
               
               // Collision force to prevent overlaps
               graphRef.current.d3Force('collision', d3.forceCollide()
@@ -201,7 +212,7 @@ const GraphSection = () => {
       clearTimeout(initialTimer)
       clearInterval(interval)
     }
-  }, [graphData])
+  }, [graphData, isMobile])
 
   // Handle window resize - update dimensions and reheat simulation
   useEffect(() => {
@@ -226,9 +237,11 @@ const GraphSection = () => {
         updateDimensions()
         
         if (graphRef.current && graphData.nodes.length > 0) {
-          // Re-apply forces
-          graphRef.current.d3Force('y-compression', d3.forceY().strength(0.25))
-          graphRef.current.d3Force('x-compression', d3.forceX().strength(0.02))
+          // Re-apply forces with mobile detection
+          const yStrength = isMobile ? 0.02 : 0.25
+          const xStrength = isMobile ? 0.25 : 0.02
+          graphRef.current.d3Force('y-compression', d3.forceY().strength(yStrength))
+          graphRef.current.d3Force('x-compression', d3.forceX().strength(xStrength))
           
           // Reheat simulation to redistribute nodes
           graphRef.current.d3ReheatSimulation()
@@ -246,12 +259,12 @@ const GraphSection = () => {
     // Initial dimensions
     updateDimensions()
     
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      clearTimeout(resizeTimer)
-    }
-  }, [graphData])
+      window.addEventListener('resize', handleResize)
+      return () => {
+        window.removeEventListener('resize', handleResize)
+        clearTimeout(resizeTimer)
+      }
+    }, [graphData, isMobile])
 
   const handleNodeHover = (node) => {
     setHoveredNode(node)
@@ -569,13 +582,15 @@ const GraphSection = () => {
                    // Configure center force - reduced to allow more horizontal spread
                    force.strength(0.02)
                 }
-                // Add vertical compression force to create oval/landscape spread
+                // Add vertical compression force - vertical oval on mobile (< 810px), horizontal on desktop
                 if (forceName === 'y-compression') {
-                  return d3.forceY().strength(0.25)
+                  const strength = window.innerWidth <= 810 ? 0.02 : 0.25
+                  return d3.forceY().strength(strength)
                 }
-                // Add horizontal compression (weaker to allow more spread)
+                // Add horizontal compression - strong on mobile (vertical oval), weak on desktop
                 if (forceName === 'x-compression') {
-                  return d3.forceX().strength(0.02)
+                  const strength = window.innerWidth <= 810 ? 0.25 : 0.02
+                  return d3.forceX().strength(strength)
                 }
                 // Add collision force to prevent overlaps
                 if (forceName === 'collision') {
@@ -596,8 +611,10 @@ const GraphSection = () => {
                 // Optional: Ensure forces are maintained if needed, but don't re-heat or zoom here
                 if (graphRef.current) {
                   // Re-apply forces to ensure stability without restarting simulation loop
-                  graphRef.current.d3Force('y-compression', d3.forceY().strength(0.25))
-                  graphRef.current.d3Force('x-compression', d3.forceX().strength(0.02))
+                  const yStrength = window.innerWidth <= 810 ? 0.02 : 0.25
+                  const xStrength = window.innerWidth <= 810 ? 0.25 : 0.02
+                  graphRef.current.d3Force('y-compression', d3.forceY().strength(yStrength))
+                  graphRef.current.d3Force('x-compression', d3.forceX().strength(xStrength))
                 }
               }}
               // ZOOM_PAN_DISABLED: Set these to true to re-enable zoom and pan
