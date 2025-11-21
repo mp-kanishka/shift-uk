@@ -5,12 +5,21 @@ import './StatsSection.css'
 const StatsSection = () => {
   const sectionRef = useRef(null)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   
   // Use Framer Motion's useScroll for smoother parallax
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
   })
+
+  // Check for mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 1300)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,7 +53,7 @@ const StatsSection = () => {
     
     const handleScrollSnap = () => {
       // Disable snap on mobile
-      if (window.innerWidth <= 768) return;
+      if (window.innerWidth <= 1300) return;
 
       window.clearTimeout(isScrolling);
 
@@ -70,8 +79,8 @@ const StatsSection = () => {
         // 2. The Blue Circle (further down stats scroll)
         
         // Let's define snap points relative to the document
-        // The section starts after the hero wrapper (150vh)
-        const sectionStart = windowHeight * 1.5; 
+        // The section starts after the hero wrapper (150vh) and shift narrative (100vh) = 250vh
+        const sectionStart = windowHeight * 2.5; 
         
         // Snap point 1: Red Box (approx 200vh + some buffer)
         const snapPoint1 = sectionStart + windowHeight * 0.2;
@@ -113,6 +122,31 @@ const StatsSection = () => {
   }
   const shiftAmount = horizontalP * 100 // Shift 100vw left
   
+  // Mobile version - simple bullet points
+  if (isMobile) {
+    return (
+      <section ref={sectionRef} className="stats-section stats-section-mobile">
+        <div className="stats-mobile-container">
+          <div className="stat-bullet">
+            <span className="bullet-icon">🇬🇧</span>
+            <p>We have the largest tech economy in Europe, and third largest in the world</p>
+          </div>
+
+          <div className="stat-bullet">
+            <span className="bullet-icon">🦄</span>
+            <p>We've produced more unicorns than France and Germany combined</p>
+          </div>
+
+          <div className="stat-bullet">
+            <span className="bullet-icon">🚀</span>
+            <p>Over 160 unicorns took their first steps in the United Kingdom</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  // Desktop version - horizontal scroll
   return (
     <section ref={sectionRef} className="stats-section">
       <div className="stats-sticky-container">

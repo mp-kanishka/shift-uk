@@ -4,6 +4,27 @@
   background-color: #012169;
 }
 
+.app-logo {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  z-index: 1000;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.app-logo-uk {
+  background-image: url('/Flag_of_the_United_Kingdom.png');
+  background-size: cover;
+  background-position: center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 /* Shared fixed background for hero, stats, and graph sections */
 .shared-background {
   position: fixed;
@@ -128,5 +149,14 @@
   height: 150vh; /* Reduced from 200vh to decrease scroll distance */
   position: relative;
   z-index: 1;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .app-logo {
+    font-size: 1.5rem;
+    top: 1rem;
+    left: 1rem;
+  }
 }
 

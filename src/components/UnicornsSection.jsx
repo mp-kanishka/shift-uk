@@ -1,14 +1,26 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import './UnicornsSection.css'
 
 const UnicornsSection = () => {
   const sectionRef = useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check for mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 1300)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Scroll snapping logic to make it feel properly sticky
   useEffect(() => {
     let isScrolling;
     
     const handleScrollSnap = () => {
+      // Disable snap on mobile
+      if (window.innerWidth <= 1300) return;
+      
       window.clearTimeout(isScrolling);
 
       // Set a timeout to run after scrolling ends
@@ -56,6 +68,11 @@ const UnicornsSection = () => {
       window.clearTimeout(isScrolling);
     };
   }, []);
+
+  // Don't render on mobile
+  if (isMobile) {
+    return null
+  }
 
   return (
     <section ref={sectionRef} className="unicorns-section">
