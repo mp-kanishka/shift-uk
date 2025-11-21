@@ -152,6 +152,12 @@
 }
 
 /* Mobile responsiveness */
+@media (max-width: 1300px) {
+  .hero-wrapper {
+    height: 60vh; /* Even shorter scroll on mobile */
+  }
+}
+
 @media (max-width: 768px) {
   .app-logo {
     font-size: 1.5rem;

@@ -152,6 +152,21 @@
   transform: rotate(90deg);
 }
 
+@media (max-width: 1300px) {
+  .graph-section {
+    min-height: 120vh; /* Taller on mobile */
+  }
+
+  .graph-container {
+    min-height: 120vh; /* Taller on mobile */
+  }
+
+  .graph-wrapper {
+    height: calc(120vh - 120px); /* Taller on mobile */
+    min-height: calc(120vh - 120px);
+  }
+}
+
 @media (max-width: 768px) {
   .graph-header {
     padding: 1.5rem 1rem 0.5rem;
@@ -166,7 +181,7 @@
   }
   
   .graph-wrapper {
-    height: calc(90vh - 100px);
+    height: calc(120vh - 100px); /* Taller on mobile */
   }
   
   .node-details {

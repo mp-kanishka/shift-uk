@@ -13,16 +13,19 @@ const ShiftNarrativeSection = () => {
       const windowHeight = window.innerHeight
       const scrollY = window.scrollY
       
-      // Section starts at 150vh (after hero)
-      // Section is 100vh tall, so it ends at 250vh
-      const sectionStart = windowHeight * 1.5
-      const sectionEnd = windowHeight * 2.5
+      // Check if mobile
+      const isMobile = window.innerWidth <= 1300
       
-      // Fade in: from 120vh to 140vh (start earlier, 20vh fade in)
-      const fadeInStart = windowHeight * 1.2
-      const fadeInEnd = windowHeight * 1.4
+      // Desktop: Section starts at 150vh (after hero), ends at 250vh
+      // Mobile: Section starts at 60vh (after shorter hero), ends at 160vh
+      const sectionStart = isMobile ? windowHeight * 0.6 : windowHeight * 1.5
+      const sectionEnd = isMobile ? windowHeight * 1.6 : windowHeight * 2.5
       
-      // Fade out: from 235vh to 250vh (15vh fade out, later)
+      // Fade in: start early on both mobile and desktop
+      const fadeInStart = isMobile ? windowHeight * 0.2 : windowHeight * 0.8
+      const fadeInEnd = isMobile ? windowHeight * 0.35 : windowHeight * 1.0
+      
+      // Fade out: proportional to section end
       const fadeOutStart = sectionEnd - (windowHeight * 0.15)
       const fadeOutEnd = sectionEnd
       

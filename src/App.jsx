@@ -27,8 +27,8 @@ function App() {
       // On mobile, keep background blue throughout
       if (isMobile) {
         setBgColor('#012169')
-        // Still handle logo animation on mobile
-        const heroScrollEnd = windowHeight * 0.8
+        // Still handle logo animation on mobile - shorter scroll distance
+        const heroScrollEnd = windowHeight * 0.3 // Very short animation for 60vh hero
         if (scrollY <= heroScrollEnd) {
           const scaleProgress = scrollY / heroScrollEnd
           const scale = 1.8 - (scaleProgress * 0.8)
