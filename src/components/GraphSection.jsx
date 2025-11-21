@@ -15,6 +15,7 @@ const GraphSection = () => {
   const sectionRef = useRef(null)
   const graphRef = useRef(null)
   const isInView = useInView(sectionRef, { amount: 0.2 })
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
   // Color palette - variations on C8102E (red), 00A3E8 (blue), F5F5F5 (light)
   const colorPalette = [
@@ -199,6 +200,56 @@ const GraphSection = () => {
     return () => {
       clearTimeout(initialTimer)
       clearInterval(interval)
+    }
+  }, [graphData])
+
+  // Handle window resize - update dimensions and reheat simulation
+  useEffect(() => {
+    let resizeTimer
+    
+    const updateDimensions = () => {
+      if (sectionRef.current) {
+        const wrapper = sectionRef.current.querySelector('.graph-wrapper')
+        if (wrapper) {
+          setDimensions({
+            width: wrapper.clientWidth,
+            height: wrapper.clientHeight
+          })
+        }
+      }
+    }
+    
+    const handleResize = () => {
+      // Debounce resize events
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(() => {
+        updateDimensions()
+        
+        if (graphRef.current && graphData.nodes.length > 0) {
+          // Re-apply forces
+          graphRef.current.d3Force('y-compression', d3.forceY().strength(0.25))
+          graphRef.current.d3Force('x-compression', d3.forceX().strength(0.02))
+          
+          // Reheat simulation to redistribute nodes
+          graphRef.current.d3ReheatSimulation()
+          
+          // Zoom to fit after a brief delay
+          setTimeout(() => {
+            if (graphRef.current) {
+              graphRef.current.zoomToFit(400, 50)
+            }
+          }, 300)
+        }
+      }, 250) // Wait 250ms after resize stops
+    }
+    
+    // Initial dimensions
+    updateDimensions()
+    
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(resizeTimer)
     }
   }, [graphData])
 
@@ -463,10 +514,12 @@ const GraphSection = () => {
           <p className="graph-subtitle">We're making the UK the world's best AI deployment hub</p>
         </div>
         <div className="graph-wrapper">
-          {graphData.nodes.length > 0 && (
+          {graphData.nodes.length > 0 && dimensions.width > 0 && (
             <ForceGraph2D
               ref={graphRef}
               graphData={graphData}
+              width={dimensions.width}
+              height={dimensions.height}
               nodeLabel="" // Disable tooltip to prevent double popup
               nodeColor={node => {
                 if (node === hoveredNode) return '#FFFFFF'
