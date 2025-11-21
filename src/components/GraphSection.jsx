@@ -30,37 +30,12 @@ const GraphSection = () => {
     '#1A7AA8',       // Deep blue
     '#D4D4D4'        // Light gray variation
   ]
-  const defaultCategoryOrder = [
-    'Research',
-    'Industry',
-    'Healthcare',
-    'Education',
-    'Infrastructure',
-    'Startup',
-    'Defence',
-    'Energy',
-    'Creative',
-    'Legal',
-    'Entertainment'
-  ]
-
-  const getCategoryColor = (() => {
-    const assigned = new Map()
-    let paletteIndex = 0
-
-    return (category = 'General') => {
-      if (assigned.has(category)) return assigned.get(category)
-
-      let color
-      const defaultIndex = defaultCategoryOrder.indexOf(category)
-      if (defaultIndex !== -1) {
-        color = colorPalette[defaultIndex % colorPalette.length]
-      } else {
-        color = colorPalette[paletteIndex % colorPalette.length]
-        paletteIndex++
-      }
-
-      assigned.set(category, color)
+  const getRandomColor = (() => {
+    const cache = new Map()
+    return (id) => {
+      if (cache.has(id)) return cache.get(id)
+      const color = colorPalette[Math.floor(Math.random() * colorPalette.length)]
+      cache.set(id, color)
       return color
     }
   })()
@@ -98,15 +73,16 @@ const GraphSection = () => {
               const category = row.Category || 'General'
               
               // Create investment node with random color
+              const nodeId = `investment-${index}`
               const node = {
-                id: `investment-${index}`,
+                id: nodeId,
                 name: row.Title || row.Name || 'Investment',
                 description: row.Description || '',
                 category: category,
                 date: row.Date || '',
                 type: 'investment',
                 size: 8 + Math.random() * 5, // Random size variation 8-13px (reduced from 10-18px)
-                color: getCategoryColor(category)
+                color: getRandomColor(nodeId)
               }
               
               nodes.push(node)
