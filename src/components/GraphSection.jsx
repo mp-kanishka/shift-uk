@@ -90,6 +90,7 @@ const GraphSection = () => {
                 description: row.Description || '',
                 category: category,
                 date: row.Date || '',
+                link: row.Link || '',
                 type: 'investment',
                 size: 8 + Math.random() * 5, // Random size variation 8-13px (reduced from 10-18px)
                 color: getRandomColor(nodeId)
@@ -642,6 +643,16 @@ const GraphSection = () => {
               <h3>{selectedNode.name}</h3>
               {selectedNode.description && (
                 <p className="description">{selectedNode.description}</p>
+              )}
+              {selectedNode.link && (
+                <a
+                  href={selectedNode.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="source-link"
+                >
+                  View Source →
+                </a>
               )}
             </motion.div>
           </div>
